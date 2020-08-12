@@ -14,4 +14,11 @@ return function (App $app) {
         // Render index view
         return $container->get('renderer')->render($response, 'index.phtml', $args);
     });
+
+    $app->get('/about/', function (Request $request, Response $response, array $args) {
+        // send message to log
+        $this->logger->info("someone accessed /about/");
+        // show message
+        echo "it's an about page!";
+    });
 };
