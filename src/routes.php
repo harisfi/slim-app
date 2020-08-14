@@ -7,7 +7,7 @@ use Slim\Http\Response;
 return function (App $app) {
     $container = $app->getContainer();
 
-    $app->get('/[{name}]', function (Request $request, Response $response, array $args) use ($container) {
+    $app->get('/[{nama}]', function (Request $request, Response $response, array $args) use ($container) {
         // Sample log message
         $container->get('logger')->info("Slim-Skeleton '/' route");
 
@@ -41,7 +41,7 @@ return function (App $app) {
 
     $app->get("/coffees/search/", function (Request $request, Response $response, $args){
         $keyword = $request->getQueryParam("keyword");
-        $sql = "SELECT * FROM coffees WHERE name LIKE '%$keyword%' OR desc LIKE '%$keyword%' OR source LIKE '%$keyword%'";
+        $sql = "SELECT * FROM coffees WHERE nama LIKE '%$keyword%' OR rincian LIKE '%$keyword%' OR source LIKE '%$keyword%'";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         $result = $stmt->fetchAll();
@@ -50,18 +50,20 @@ return function (App $app) {
 
     $app->post("/coffees/", function (Request $request, Response $response){
 
-        $new_book = $request->getParsedBody();
+        $new_entry = $request->getParsedBody();
     
-        $sql = "INSERT INTO coffees (name, source, desc) VALUE (:name, :source, :desc)";
+        $sql = "INSERT INTO coffees (nama, source, rincian) VALUE (:nm, :src, :dsc)";
         $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(":nm", $new_entry["nama"], PDO::PARAM_STR);
+        $stmt->bindParam(":src", $new_entry["source"], PDO::PARAM_STR);
+        $stmt->bindParam(":dsc", $new_entry["rincian"], PDO::PARAM_STR);
+        // $data = [
+        //     ":nm" => $new_entry["nama"],
+        //     ":src" => $new_entry["source"],
+        //     ":dsc" => $new_entry["rincian"]
+        // ];
     
-        $data = [
-            ":name" => $new_book["name"],
-            ":source" => $new_book["source"],
-            ":desc" => $new_book["desc"]
-        ];
-    
-        if($stmt->execute($data))
+        if($stmt->execute())
            return $response->withJson(["status" => "success", "data" => "1"], 200);
         
         return $response->withJson(["status" => "failed", "data" => "0"], 200);
@@ -70,14 +72,14 @@ return function (App $app) {
     $app->put("/coffees/{id}", function (Request $request, Response $response, $args){
         $id = $args["id"];
         $new_book = $request->getParsedBody();
-        $sql = "UPDATE coffees SET name=:name, source=:source, desc=:desc WHERE coffee_id=:id";
+        $sql = "UPDATE coffees SET nama=:nama, source=:source, rincian=:rincian WHERE coffee_id=:id";
         $stmt = $this->db->prepare($sql);
         
         $data = [
             ":id" => $id,
-            ":name" => $new_book["name"],
+            ":nama" => $new_book["nama"],
             ":source" => $new_book["source"],
-            ":desc" => $new_book["desc"]
+            ":rincian" => $new_book["rincian"]
         ];
     
         if($stmt->execute($data))
