@@ -21,12 +21,26 @@ return function (App $app) {
     };
 
     // database
-    $container['db'] = function ($c) {
+    $container['db'] = function ($c){
         $settings = $c->get('settings')['db'];
-        $server = $settings['driver']."host=".$settings['host'].";dbname=".$settings['dbname'];
-        $conn = new PDO($server, $settings["user"], $settings["pass"]);
-        $conn->setAttribute(PDO::AFTER_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        $server = $settings['driver'].":host=".$settings['host'].";dbname=".$settings['dbname'];
+        //$conn = new PDO($server, $settings["user"], $settings["pass"]);
+        $host = "127.0.0.1";
+        $user = "root";
+        $pass = "";
+        $dbname = "tokokopi";
+        $charset = 'utf8mb4'; // Always set charset for database
+        $port = '3306';
+        
+        $options = [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ];
+
+        $conn = new PDO("mysql:host=$host;dbname=$dbname;port=$port;charset=$charset", $user, $pass, $options);
+        //$conn = new PDO("mysql:host=$host;dbname=$dbname", $user, $pass);
+        //$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         return $conn;
     };
 };

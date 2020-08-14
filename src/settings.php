@@ -18,11 +18,11 @@ return [
 
         // Database settings
         'db' > [
-            'host' => 'localhost',
+            'driver' => 'mysql',
+            'host' => '127.0.0.1',
             'user' => 'root',
-            'pass' => 'kopi',
-            'dbname' => 'tokokopi',
-            'driver' => 'mysql'
+            'pass' => '',
+            'dbname' => 'tokokopi'
         ]
-    ],
+    ]
 ];
