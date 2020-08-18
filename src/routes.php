@@ -3,6 +3,7 @@
 use Slim\App;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use Slim\Http\UploadedFile;
 
 return function (App $app) {
     $container = $app->getContainer();
@@ -101,5 +102,31 @@ return function (App $app) {
            return $response->withJson(["status" => "success", "data" => "1"], 200);
         
         return $response->withJson(["status" => "failed", "data" => "0"], 200);
+    });
+
+    $app->post('/coffees/photo/{id}', function(Request $request, Response $response, $args) {
+        $uploadedFiles = $request->getUploadedFiles();
+
+        $uploadedFile = $uploadedFiles['photo'];
+        if ($uploadedFile->getError() == UPLOAD_ERR_OK) {
+            $ext = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
+            $filename = sprintf('%s.%0.8s', $args["id"], $ext);
+            
+            $dir = $this->get('settings')['uploadDirectory'];
+            $uploadedFile->moveTo($dir . DIRECTORY_SEPARATOR . $filename);
+
+            $sql = "UPDATE coffees SET photo=:photo WHERE coffee_id=:id";
+            $stmt = $this->db->prepare($sql);
+            $params = [
+                ":id" => $args["id"],
+                ":photo" => $filename
+            ];
+
+            if($stmt->execute($params)){
+                $url = $request->getUri()->getBaseUrl()."/uploads/".$filename;
+                return $response->withJson(["status" => "success", "data => $url"], 200);
+            }
+            return $response->withJson(["status" => "failed", "data" => "0"], 200);
+        }
     });
 };
